@@ -131,7 +131,7 @@ int FindPath(const int iStartX, const int iStartY,
             std::memcpy(pOutBuffer, vecPath.data(), sizeof(int) * vecPath.size());
         }
 
-        return vecPath.size();
+        return static_cast<int>(vecPath.size());
     }
     else if (!isFindPathEnabled) {
         std::cout << "\tCalculation time is over with no findings" << std::endl;
@@ -230,7 +230,7 @@ void PathSplicing(Input& input,
 
     std::cout << "Path Splicing. Recalculating..." << std::endl;
     // Finding min changed Index in path
-    int iMinIndex = input._path.size();
+    std::size_t uiMinIndex = input._path.size();
     for (int node : modifiedNodes) {
         std::vector<std::pair<int, int>> toValidIndex(Constants::ALLOWED_MOVES.begin(), Constants::ALLOWED_MOVES.end());
         toValidIndex.push_back(std::make_pair(0, 0));
@@ -243,43 +243,42 @@ void PathSplicing(Input& input,
             if (iToIndex != Constants::UNDEFINED_VALUE_INT) {
                 auto pathIndex = std::find(input._path.begin(), input._path.end(), iToIndex);
 
-                if (pathIndex != input._path.end() && iMinIndex > (pathIndex - input._path.begin())) {
-                    iMinIndex = pathIndex - input._path.begin();
+                if (pathIndex != input._path.end() && uiMinIndex > static_cast<unsigned>(pathIndex - input._path.begin())) {
+                    uiMinIndex = pathIndex - input._path.begin();
                 }
             }
         }
     }
 
-    if (iMinIndex != input._path.size()) {
+    if (uiMinIndex != input._path.size()) {
         // Recalculating path from minIndex - 1
-        if (iMinIndex != 0) {
+        if (uiMinIndex > 0) {
             Input tmpInput;
             tmpInput._mapDimensions = input._mapDimensions;
-            tmpInput._sourceCoord = std::make_pair(Utilities::GetX(input._path[iMinIndex - 1], input._mapDimensions.first),
-                                                   Utilities::GetY(input._path[iMinIndex - 1], input._mapDimensions.first));
+            tmpInput._sourceCoord = std::make_pair(Utilities::GetX(input._path[uiMinIndex - 1], input._mapDimensions.first),
+                                                   Utilities::GetY(input._path[uiMinIndex - 1], input._mapDimensions.first));
             tmpInput._targetCoord = input._targetCoord;
             tmpInput._iBufferSize = input._iBufferSize;
             tmpInput._isRetryEnabled = 1;
 
             int iResult = ExecuteFindPath(tmpInput, map);
             if (iResult != Constants::NOK) {
-                if (input._path.size() != iMinIndex + iResult) {
-                    input._path.resize(iMinIndex + iResult);
-                    std::copy(tmpInput._path.begin(), tmpInput._path.begin() + iResult, input._path.begin() + iMinIndex);
+                if (input._path.size() != uiMinIndex + iResult) {
+                    input._path.resize(uiMinIndex + iResult);
+                    std::copy(tmpInput._path.begin(), tmpInput._path.begin() + iResult, input._path.begin() + uiMinIndex);
                 }
 
-                PrintPath(input._path, input._path.size());
+                PrintPath(input._path, static_cast<int>(input._path.size()));
             } else {
                 std::cerr << "Error. Recaulculation failed. ("
                     << tmpInput._sourceCoord.first << ", " << tmpInput._sourceCoord.second << ") -> ("
                     << tmpInput._targetCoord.first << ", " << tmpInput._targetCoord.second << ")" << std::endl;
             }
-        }
-        else {
+        } else {
             int iResult = ExecuteFindPath(input, map);
 
             if (iResult != Constants::NOK) {
-                PrintPath(input._path, input._path.size());
+                PrintPath(input._path, static_cast<int>(input._path.size()));
             }
         }
     }
