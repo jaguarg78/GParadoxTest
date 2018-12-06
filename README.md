@@ -6,7 +6,7 @@ This is a test to apply to Paradox.
 This is an implementation of A\* algorigthm to find the path between 2 points (x, y) - Source, Target - into a map with obstacles.
 
 # Features:
-- Map information can be retrieved from test_\*.map files in maps directory or harcoded using the tests. 
+- Map information can be retrieved from test_\*.map files in maps directory or hardcoded using the tests. 
 - A\* algorithm Implementation.
 - Basic Timer to define a max time for calculation (limit 5s - 5000000 us).
 - PathSlicing in the case that map is been modified, then path should be recalculated.
